@@ -6,11 +6,14 @@ public class Player : MonoBehaviour
 {
     public bool canTripleShot = false;
     public bool isSpeedBoostActive = false;
+    public bool isShieldUp = false;
     public int lives = 3;
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
     private GameObject _tripleshotPrefab;
+    [SerializeField]
+    private GameObject _shieldPrefab;
 
     [SerializeField] private float fireRate = 0.25f;
     private float nextFire = 0.0f;
@@ -93,11 +96,26 @@ public class Player : MonoBehaviour
     }
     public void Damage()
     {
-        lives--;
-        if (lives < 1)
+        if (isShieldUp == true)
         {
-            Destroy(this.gameObject);
+            isShieldUp = false;
+            _shieldPrefab.SetActive(false);
         }
+        else
+        {
+            lives--;
+            if (lives < 1)
+            {
+                Destroy(this.gameObject);
+            }
+        }
+        
+    }
+
+    public void ShieldUp(){
+        isShieldUp = true;
+        _shieldPrefab.SetActive(true);
+        StartCoroutine(ShieldDeactive());
     }
 
     public void TripleShotPowerupOn()
@@ -106,7 +124,7 @@ public class Player : MonoBehaviour
         StartCoroutine(TripleShotPowerDownRoutine());
     }
     public void SpeedBoostPowerupOn()
-    {
+    {     
         isSpeedBoostActive = true;
         StartCoroutine(SpeedBoostPowerDownRoutine());
     }
@@ -121,6 +139,14 @@ public class Player : MonoBehaviour
     {
         yield return new WaitForSeconds(5.0f);
         isSpeedBoostActive = false;
+    }
+
+
+    public IEnumerator ShieldDeactive()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _shieldPrefab.SetActive(false);
+        isShieldUp = false;
     }
 
 
